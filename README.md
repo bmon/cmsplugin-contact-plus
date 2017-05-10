@@ -21,12 +21,12 @@ cmsplugin-contact-plus is licensed under the MIT License.
 	```
 	pip install -e git+git://github.com/arteria/cmsplugin-contact-plus.git#egg=cmsplugin_contact_plus
 	```
+2. cmsplugin-contact-plus requires https://github.com/iambrandontaylor/django-admin-sortable as dependency. Please have a look at the "Supported Django Versions", "Installation", and "Configuration" sections of the [README](https://github.com/iambrandontaylor/django-admin-sortable/blob/master/README.md).
 
+3. Put ``cmsplugin_contact_plus`` and ``adminsortable`` in your INSTALLED_APPS `settings.py` section and verify that the [ADMINS](https://docs.djangoproject.com/en/dev/ref/settings/#admins) setting is set as well.
 
-2. Put ``cmsplugin_contact_plus`` in your INSTALLED_APPS `settings.py` section and verify that the [ADMINS](https://docs.djangoproject.com/en/dev/ref/settings/#admins) setting is set as well.
-
-3. Don't forget to migrate your database.
-4. Configure Django's [e-mail settings](https://docs.djangoproject.com/en/1.8/topics/email/#quick-example) appropriately.
+4. Don't forget to migrate your database.
+5. Configure Django's [e-mail settings](https://docs.djangoproject.com/en/1.8/topics/email/#quick-example) appropriately.
 
 ## Configuration/Settings
 
@@ -46,13 +46,28 @@ To send a carbon copy to the submitter you can set the ``CONTACT_PLUS_SEND_COPY_
 
 Defines the required CSS class, default is `required`.
 
+### ``CMSPLUGIN_CONTACT_PLUS_TEMPLATES``
+
+To allow users to choose between multiple contact form templates, specify the template choices in your project settings like this:
+
+```python
+CMSPLUGIN_CONTACT_PLUS_TEMPLATES = [
+    ('cmsplugin_contact_plus/contact.html', 'Contact Form'),
+    ('cmsplugin_contact_plus/contact_newsletter.html', 'Newsletter Form'),
+]
+```
+
+Make sure that the templates can be loaded by Django.
+
 ### ``CMSPLUGIN_CONTACT_FORM_VALIDATORS``
 
 Specify ``CMSPLUGIN_CONTACT_FORM_VALIDATORS`` in your projects settings to one or more [validator functions](https://docs.djangoproject.com/en/dev/ref/validators/) that are used with the CharFieldWithValidator field. Expected is a list of strings, each string should point a validator function by its full path. For example:
 
+```python
 CMSPLUGIN_CONTACT_FORM_VALIDATORS = [
   'myproject.utils.validators.phone_number_validator',
 ]
+```
 
 ### reCAPTCHA
 
@@ -95,6 +110,16 @@ If you are not using the default template settings of Django, make sure that  ``
 ### Development
 
 Please have a look at the latest commits for the work-in-progress development version.
+
+### 1.3.5 - 22. 02. 2017
+- Replaced https://github.com/centralniak/django-inline-ordering dependency with https://github.com/iambrandontaylor/django-admin-sortable.
+  Upgrading: Remove `'inline_ordering'` from `INSTALLED_APPS `and add `'adminsortable'` instead.
+  
+### 1.3.2 - 07. 12. 2016
+- Fixed `MANIFEST.in`. Locale files are now correctly included
+
+### 1.3.1 - 07. 11. 2016
+- Added a missing migration
 
 ### 1.3.0 - 10. 10. 2016
 - Renamed plugin field `submit` to `submit_button_text` to achieve django CMS 3.3/3.4 compatibility. Please migrate your database and update your templates.

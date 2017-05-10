@@ -1,3 +1,4 @@
+from django.utils.http import urlquote
 from django import forms
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -28,6 +29,9 @@ class ContactFormPlus(forms.Form):
                 if extraField.fieldType == 'CharField':
                     self.fields[slugify(extraField.label)] = forms.CharField(label=extraField.label,
                             initial=extraField.initial,
+                            widget=forms.TextInput(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
                             required=extraField.required)
                 elif extraField.fieldType == 'BooleanField':
                     self.fields[slugify(extraField.label)] = forms.BooleanField(label=extraField.label,
@@ -36,14 +40,23 @@ class ContactFormPlus(forms.Form):
                 elif extraField.fieldType == 'EmailField':
                     self.fields[slugify(extraField.label)] = forms.EmailField(label=extraField.label,
                             initial=extraField.initial,
+                            widget=forms.TextInput(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
                             required=extraField.required)
                 elif extraField.fieldType == 'DecimalField':
                     self.fields[slugify(extraField.label)] = forms.DecimalField(label=extraField.label,
                             initial=extraField.initial,
+                            widget=forms.TextInput(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
                             required=extraField.required)
                 elif extraField.fieldType == 'FloatField':
                     self.fields[slugify(extraField.label)] = forms.FloatField(label=extraField.label,
                             initial=extraField.initial,
+                            widget=forms.TextInput(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
                             required=extraField.required)
                 elif extraField.fieldType == 'FileField': 
                     self.fields[slugify(extraField.label)] = forms.FileField(label=extraField.label,
@@ -56,15 +69,31 @@ class ContactFormPlus(forms.Form):
                 elif extraField.fieldType == 'IntegerField':
                     self.fields[slugify(extraField.label)] = forms.IntegerField(label=extraField.label,
                             initial=extraField.initial,
+                            widget=forms.TextInput(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
+                            required=extraField.required)
+                elif extraField.fieldType == 'DateField':
+                    self.fields[slugify(extraField.label)] = forms.DateField(label=extraField.label,
+                            initial=extraField.initial,
+                            required=extraField.required)
+                elif extraField.fieldType == 'DateTimeField':
+                    self.fields[slugify(extraField.label)] = forms.DateTimeField(label=extraField.label,
+                            initial=extraField.initial,
                             required=extraField.required)
                 elif extraField.fieldType == 'IPAddressField':
                     self.fields[slugify(extraField.label)] = forms.IPAddressField(label=extraField.label,
                             initial=extraField.initial,
+                            widget=forms.TextInput(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
                             required=extraField.required)
                 elif extraField.fieldType == 'auto_Textarea':
                     self.fields[slugify(extraField.label)] = forms.CharField(label=extraField.label,
                             initial=extraField.initial,
-                            widget=forms.Textarea,
+                            widget=forms.Textarea(
+                                attrs={'placeholder': extraField.placeholder}
+                            ),
                             required=extraField.required)
                 elif extraField.fieldType == 'auto_hidden_input':
                     self.fields[slugify(extraField.label)] = forms.CharField(label=extraField.label,
@@ -102,6 +131,9 @@ class ContactFormPlus(forms.Form):
                     self.fields[slugify(extraField.label)] = forms.CharField(
                         label=extraField.label,
                         initial=extraField.initial,
+                        widget=forms.Textarea(
+                            attrs={'placeholder': extraField.placeholder}
+                        ),
                         required=extraField.required,
                         validators=get_validators())
 
@@ -122,7 +154,7 @@ class ContactFormPlus(forms.Form):
                     if settings.MEDIA_URL.startswith("http"):
                         value = "%s%s" % (settings.MEDIA_URL, val)
                     else:
-                        value = "http://%s%s%s" % (current_site, settings.MEDIA_URL, val)
+                        value = "http://%s%s%s" % (current_site, settings.MEDIA_URL, urlquote(val))
                 ordered_dic_list.append({field.label: value})
 
         # Automatically match reply-to email address in form

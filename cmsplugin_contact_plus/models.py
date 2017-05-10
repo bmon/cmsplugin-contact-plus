@@ -1,5 +1,3 @@
-import threading
-
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -8,20 +6,15 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.db.models import Model
 
 from cms.models import CMSPlugin
-from inline_ordering.models import Orderable
+from adminsortable.models import SortableMixin
 from jsonfield import JSONField
+
+from cmsplugin_contact_plus import local_settings
 
 try:
     DEFAULT_FROM_EMAIL_ADDRESS = settings.ADMINS[0][1]
 except:
     DEFAULT_FROM_EMAIL_ADDRESS = ''
-
-from cmsplugin_contact_plus import utils
-
-
-localdata = threading.local()
-localdata.TEMPLATE_CHOICES = utils.autodiscover_templates()
-TEMPLATE_CHOICES = localdata.TEMPLATE_CHOICES
 
 def get_current_site():
     try:
@@ -52,9 +45,9 @@ class ContactPlus(CMSPlugin):
             max_length=30)
     template = models.CharField(
             max_length=255,
-            choices=TEMPLATE_CHOICES,
+            choices=local_settings.CMSPLUGIN_CONTACT_PLUS_TEMPLATES,
             default='cmsplugin_contact_plus/contact.html',
-            editable=len(TEMPLATE_CHOICES) > 1)
+            editable=len(local_settings.CMSPLUGIN_CONTACT_PLUS_TEMPLATES) > 1)
             
     class Meta:
         verbose_name = "Contact Plus Form"
@@ -84,6 +77,8 @@ FIELD_TYPE = (('CharField', 'CharField'),
               ('DecimalField', 'DecimalField'),
               ('FloatField', 'FloatField'),
               ('IntegerField', 'IntegerField'),
+              ('DateField', 'DateField'),
+              ('DateTimeField', 'DateTimeField'),
               ('FileField', 'FileField'),
               ('ImageField', 'ImageField'),
               ('IPAddressField', 'IPAddressField'),
@@ -98,7 +93,7 @@ if recaptcha_installed():
 
 
 @python_2_unicode_compatible
-class ExtraField(Orderable):
+class ExtraField(SortableMixin):
     """
     """
     form = models.ForeignKey(ContactPlus, verbose_name=_("Contact Form"))
@@ -106,14 +101,21 @@ class ExtraField(Orderable):
     fieldType = models.CharField(max_length=100, choices=FIELD_TYPE)
     initial = models.CharField(
         _('Inital Value'), max_length=250, blank=True, null=True)
+    placeholder = models.CharField(
+        _('Placeholder Value'), max_length=250, blank=True, null=True)
     required = models.BooleanField(
         _('Mandatory field'), default=True)
     widget = models.CharField(
         _('Widget'), max_length=250, blank=True, null=True,
         help_text=_("Will be ignored in the current version."))
 
+    inline_ordering_position = models.IntegerField(blank=True, null=True, editable=True)
+
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ('inline_ordering_position',)
 
 
 @python_2_unicode_compatible
